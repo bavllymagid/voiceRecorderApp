@@ -1,5 +1,6 @@
 package project.java4.voicerecorder.fragments;
 
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -10,11 +11,13 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
@@ -38,6 +41,10 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
     private ImageButton playBtn;
     private TextView playerHeader;
     private TextView playerFileName;
+
+    private SeekBar playerSeekBar;
+    private Handler handler;
+    private Runnable updateSeekBar;
 
     MediaPlayer player = null;
     boolean isPlaying = false;
@@ -69,6 +76,8 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
         playerHeader = view.findViewById(R.id.player_header_title);
         player = new MediaPlayer();
 
+        playerSeekBar = view.findViewById(R.id.time_bar);
+
         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
@@ -83,6 +92,46 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
         fileList.setHasFixedSize(true);
         fileList.setLayoutManager(layoutManager);
         fileList.setAdapter(adapter);
+
+        playBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(isPlaying){
+                    if(fileToPlay != null) {
+                        pauseAudio();
+                    }
+                }else {
+                    if(fileToPlay != null) {
+                        resumeAudio();
+                    }
+                }
+            }
+        });
+
+
+        playerSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                if(fileToPlay != null) {
+                    pauseAudio();
+                }
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                if(fileToPlay != null) {
+                    int progress = playerSeekBar.getProgress();
+                    player.seekTo(progress);
+                    resumeAudio();
+                }
+            }
+        });
+
 
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -102,50 +151,82 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
     @Override
     public void OnItemCLicked(File file, int position) {
         Log.d("play log" , "file playing: " + file.getName());
+        fileToPlay = file;
         if(!isPlaying){
-            fileToPlay = file;
-            playAudio(fileToPlay);
-            isPlaying = true;
+            if(fileToPlay != null) {
+                playAudio(fileToPlay);
+            }
         }
         else {
-            stopAudio();
-            isPlaying = false;
-            playAudio(fileToPlay);
-            isPlaying = true;
+            if(fileToPlay != null) {
+                stopAudio();
+                playAudio(fileToPlay);
+            }
         }
     }
 
     private void stopAudio() {
-//        player.release();
-//        player.stop();
-//        player = null;
-
         playBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24, null));
         playerFileName.setText(playerFileName.getText());
         playerHeader.setText(playerHeader.getText());
+        isPlaying = false;
+        player.stop();
+        handler.removeCallbacks(updateSeekBar);
     }
 
     private void playAudio(File fileToPlay) {
         try {
+            player.reset();
             player.setDataSource(fileToPlay.getAbsolutePath());
+            player.setAudioStreamType(AudioManager.STREAM_MUSIC);
             player.prepare();
             player.start();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+        isPlaying = true;
         playBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_pause_24, null));
         playerFileName.setText(fileToPlay.getName());
         playerHeader.setText("Playing");
+
+        playerSeekBar.setMax(player.getDuration());
+
+        handler = new Handler();
+        updateRunnable();
+        handler.postDelayed(updateSeekBar, 0);
+    }
+
+    private void updateRunnable() {
+        updateSeekBar = new Runnable() {
+            @Override
+            public void run() {
+                playerSeekBar.setProgress(player.getCurrentPosition());
+                handler.postDelayed(this, 500);
+            }
+        };
+    }
+
+
+    private void pauseAudio(){
+        player.pause();
+        playBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_play_arrow_24, null));
+        isPlaying = false;
+        handler.removeCallbacks(updateSeekBar);
+    }
+
+    private void resumeAudio(){
+        player.start();
+        playBtn.setImageDrawable(getResources().getDrawable(R.drawable.ic_baseline_pause_24, null));
+        isPlaying = true;
+        updateRunnable();
+        handler.postDelayed(updateSeekBar, 0);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         if(player != null){
-            player.release();
-            player.stop();
-            player = null;
+            stopAudio();
         }
     }
 }

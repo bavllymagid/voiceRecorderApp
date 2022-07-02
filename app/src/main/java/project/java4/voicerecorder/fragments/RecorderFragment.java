@@ -2,20 +2,18 @@ package project.java4.voicerecorder.fragments;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.media.MediaRecorder;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.SystemClock;
 import android.view.LayoutInflater;
@@ -23,7 +21,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -31,7 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-import project.java4.voicerecorder.FileAdapter;
 import project.java4.voicerecorder.R;
 
 
@@ -79,7 +75,22 @@ public class RecorderFragment extends Fragment {
             @SuppressLint("NonConstantResourceId")
             @Override
             public void onClick(View view) {
-                navController.navigate(R.id.action_recorder2_to_audioListFragment);
+                if(isRecording){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(getContext());
+                    alert.setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            navController.navigate(R.id.action_recorder2_to_audioListFragment);
+                            isRecording = false;
+                        }
+                    }).setNegativeButton("Stay" , null).create();
+
+                    alert.setTitle("Audio still recording");
+                    alert.setMessage("Are you sure you want to exit recording");
+                    alert.show();
+                }
+                else
+                    navController.navigate(R.id.action_recorder2_to_audioListFragment);
             }
         });
 
@@ -90,7 +101,7 @@ public class RecorderFragment extends Fragment {
                     onRecording();
                 }
                 else {
-                    onStopRecording();
+                    stopRecording();
                 }
             }
         });
@@ -140,7 +151,7 @@ public class RecorderFragment extends Fragment {
     }
 
     @SuppressLint("SetTextI18n")
-    private void onStopRecording(){
+    private void stopRecording(){
         isRecording = false;
         recButton.setImageDrawable(getResources().getDrawable(R.drawable.ic_recording));
         recordTimer.stop();
