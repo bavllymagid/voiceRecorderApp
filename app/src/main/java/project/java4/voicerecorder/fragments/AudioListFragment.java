@@ -6,19 +6,30 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
+import java.io.File;
+import java.util.ArrayList;
+
+import project.java4.voicerecorder.FileAdapter;
 import project.java4.voicerecorder.R;
 
-public class AudioListFragment extends Fragment {
+public class AudioListFragment extends Fragment implements FileAdapter.OnItemListClicked {
 
     private ConstraintLayout playerSheet;
     private BottomSheetBehavior bottomSheetBehavior;
+    private File[] allFiles;
+    RecyclerView fileList;
+    RecyclerView.LayoutManager layoutManager;
+    FileAdapter adapter;
 
     public AudioListFragment() {
         // Required empty public constructor
@@ -35,8 +46,20 @@ public class AudioListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        String path = getActivity().getExternalFilesDir("/").getAbsolutePath();
         playerSheet = view.findViewById(R.id.player_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(playerSheet);
+        File directory = new File(path);
+        allFiles = directory.listFiles();
+
+        fileList = view.findViewById(R.id.audio_list);
+
+        adapter = new FileAdapter(allFiles , this);
+        layoutManager = new LinearLayoutManager(getContext());
+
+        fileList.setHasFixedSize(true);
+        fileList.setLayoutManager(layoutManager);
+        fileList.setAdapter(adapter);
 
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
@@ -51,5 +74,12 @@ public class AudioListFragment extends Fragment {
 
             }
         });
+    }
+
+    @Override
+    public void OnItemCLicked(File file, int position) {
+        Log.d("play log" , "file playing: " + file.getName());
+
+
     }
 }

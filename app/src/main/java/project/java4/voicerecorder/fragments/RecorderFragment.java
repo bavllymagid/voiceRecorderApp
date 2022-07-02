@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.SystemClock;
 import android.view.LayoutInflater;
@@ -29,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
+import project.java4.voicerecorder.FileAdapter;
 import project.java4.voicerecorder.R;
 
 
@@ -47,6 +50,7 @@ public class RecorderFragment extends Fragment {
     boolean isRecording = false;
 
     private MediaRecorder mediaRecorder;
+
 
     public RecorderFragment() {
         // Required empty public constructor
@@ -69,6 +73,7 @@ public class RecorderFragment extends Fragment {
         recButton = view.findViewById(R.id.record_button);
         recordTimer = view.findViewById(R.id.record_timer);
         recordStatus = view.findViewById(R.id.file_name);
+
 
         listBtn.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("NonConstantResourceId")
