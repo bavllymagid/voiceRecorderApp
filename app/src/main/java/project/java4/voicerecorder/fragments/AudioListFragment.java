@@ -8,6 +8,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -24,6 +25,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import project.java4.voicerecorder.FileAdapter;
 import project.java4.voicerecorder.R;
@@ -32,13 +35,16 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
 
     private ConstraintLayout playerSheet;
     private BottomSheetBehavior bottomSheetBehavior;
-    private File[] allFiles;
+    private ArrayList<File> allFiles;
     private RecyclerView fileList;
     private RecyclerView.LayoutManager layoutManager;
     private FileAdapter adapter;
+    DividerItemDecoration dividerItemDecoration ;
     private File fileToPlay;
 
     private ImageButton playBtn;
+    private ImageButton leftRewind;
+    private ImageButton rightRewind;
     private TextView playerHeader;
     private TextView playerFileName;
 
@@ -49,6 +55,7 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
     private MediaPlayer player = null;
     private boolean isPlaying = false;
     private boolean isFinished = false;
+    private int currentPosition;
 
     public AudioListFragment() {
         // Required empty public constructor
@@ -69,10 +76,12 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
         playerSheet = view.findViewById(R.id.player_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(playerSheet);
         File directory = new File(path);
-        allFiles = directory.listFiles();
+        allFiles = new ArrayList(Arrays.asList(directory.listFiles()));
 
         fileList = view.findViewById(R.id.audio_list);
         playBtn = view.findViewById(R.id.play_button);
+        leftRewind = view.findViewById(R.id.left_rewind);
+        rightRewind = view.findViewById(R.id.right_rewind);
         playerFileName = view.findViewById(R.id.textView);
         playerHeader = view.findViewById(R.id.player_header_title);
         player = new MediaPlayer();
@@ -94,6 +103,8 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
         fileList.setHasFixedSize(true);
         fileList.setLayoutManager(layoutManager);
         fileList.setAdapter(adapter);
+        dividerItemDecoration = new DividerItemDecoration(getActivity().getApplicationContext(), DividerItemDecoration.VERTICAL);
+        fileList.addItemDecoration(dividerItemDecoration);
 
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -167,6 +178,7 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
     public void OnItemCLicked(File file, int position) {
         Log.d("play log" , "file playing: " + file.getName());
         fileToPlay = file;
+        currentPosition = position;
         if(!isPlaying){
             if(fileToPlay != null) {
                 playAudio(fileToPlay);
@@ -182,7 +194,12 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
 
     @Override
     public void OnItemLongCLicked(File file, int position) {
-        file.delete();
+        if(file.exists()) {
+            if(isPlaying){
+                stopAudio();
+            }
+            file.delete();
+        }
     }
 
     private void stopAudio() {

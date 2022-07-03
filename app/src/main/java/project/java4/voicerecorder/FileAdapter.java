@@ -15,10 +15,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileAdapterViewHolder> {
-    private File[] allFiles;
+    private ArrayList<File> allFiles;
     private OnItemListClicked onItemListClicked;
 
-    public FileAdapter(File[] allFiles , OnItemListClicked onItemListClicked){
+    public FileAdapter(ArrayList<File> allFiles, OnItemListClicked onItemListClicked){
         this.allFiles = allFiles;
         this.onItemListClicked = onItemListClicked;
     }
@@ -32,14 +32,14 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileAdapterVie
 
     @Override
     public void onBindViewHolder(@NonNull FileAdapterViewHolder holder, int position) {
-        holder.fileName.setText(allFiles[position].getName());
-        Date d = new Date(allFiles[position].lastModified());
+        holder.fileName.setText(allFiles.get(position).getName());
+        Date d = new Date(allFiles.get(position).lastModified());
         holder.fileDate.setText(d.toString());
     }
 
     @Override
     public int getItemCount() {
-        return allFiles.length;
+        return allFiles.size();
     }
 
     public class FileAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
@@ -60,13 +60,15 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileAdapterVie
 
         @Override
         public void onClick(View view) {
-            onItemListClicked.OnItemCLicked( allFiles[getAdapterPosition()], getAdapterPosition());
+            onItemListClicked.OnItemCLicked( allFiles.get(getAdapterPosition()), getAdapterPosition());
         }
 
         @Override
         public boolean onLongClick(View view) {
-            onItemListClicked.OnItemLongCLicked(allFiles[getAdapterPosition()] , getAdapterPosition());
-            return false;
+            onItemListClicked.OnItemLongCLicked(allFiles.get(getAdapterPosition()) , getAdapterPosition());
+            allFiles.remove(getAdapterPosition());
+            notifyItemRemoved(getAdapterPosition());
+            return true;
         }
     }
 
