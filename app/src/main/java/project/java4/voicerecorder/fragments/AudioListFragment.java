@@ -246,7 +246,10 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
     public void onStop() {
         super.onStop();
         if(player != null){
-            stopAudio();
+            if(player.isPlaying()){
+                stopAudio();
+            }
+            player = null;
         }
     }
 }
