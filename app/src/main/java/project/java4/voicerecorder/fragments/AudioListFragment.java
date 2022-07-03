@@ -126,6 +126,34 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
             }
         });
 
+        leftRewind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(currentPosition - 1 >= 0) {
+                    rightRewind.setEnabled(true);
+                    stopAudio();
+                    playAudio(allFiles.get(currentPosition - 1));
+                    currentPosition -= 1;
+                }else {
+                    leftRewind.setEnabled(false);
+                }
+            }
+        });
+
+        rightRewind.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(currentPosition + 1 < allFiles.size()) {
+                    leftRewind.setEnabled(true);
+                    stopAudio();
+                    playAudio(allFiles.get(currentPosition + 1));
+                    currentPosition += 1;
+                }else {
+                    rightRewind.setEnabled(false);
+                }
+            }
+        });
+
 
         playerSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
