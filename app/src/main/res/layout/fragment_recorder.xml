@@ -22,7 +22,6 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
-
     <TextView
         android:id="@+id/file_name"
         android:layout_width="0dp"
@@ -30,24 +29,13 @@
         android:layout_margin="80dp"
         android:fontFamily="@font/advent_pro_bold"
         android:textAlignment="center"
-        android:textColor="#000000"
-        android:textSize="16sp"
-        android:visibility="visible"
+        android:textColor="@color/black"
+        android:textSize="10sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/displayImage"
-        android:text="Press to Record" />
-
-    <Chronometer
-        android:id="@+id/record_timer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/file_name"
-        android:layout_margin="50dp"
-        android:fontFamily="sans-serif-light"
-        android:textSize="64sp"/>
+        android:text="@string/press_to_record"
+        android:maxHeight="32dp"/>
 
     <ImageButton
         android:id="@+id/record_button"
@@ -75,4 +63,17 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/record_button"
         app:layout_constraintTop_toTopOf="@+id/record_button" />
+
+    <Chronometer
+        android:id="@+id/record_timer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/file_name"
+        android:layout_margin="50dp"
+        android:fontFamily="sans-serif-light"
+        android:textSize="64sp"
+        android:visibility="visible"
+        android:textColor="@color/black"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

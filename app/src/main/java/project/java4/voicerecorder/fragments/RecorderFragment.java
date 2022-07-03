@@ -23,6 +23,7 @@ import android.widget.Chronometer;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -121,9 +122,8 @@ public class RecorderFragment extends Fragment {
     private void startRecording() {
 
         recordPath = getActivity().getExternalFilesDir("/").getAbsolutePath();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy_MM_dd_hh_mm_ss" , Locale.ENGLISH);
-        Date now = new Date();
-        recordFile = "/fileName" + simpleDateFormat.format(now) +".3gp";
+        File directory = new File(recordPath);
+        recordFile = "/Voice Record "+ directory.listFiles().length +".3gp";
 
         recordStatus.setText("Recording..." + recordFile + "Now");
 

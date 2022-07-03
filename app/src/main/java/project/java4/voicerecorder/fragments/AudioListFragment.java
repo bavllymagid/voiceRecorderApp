@@ -46,8 +46,9 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
     private Handler handler;
     private Runnable updateSeekBar;
 
-    MediaPlayer player = null;
-    boolean isPlaying = false;
+    private MediaPlayer player = null;
+    private boolean isPlaying = false;
+    private boolean isFinished = false;
 
     public AudioListFragment() {
         // Required empty public constructor
@@ -82,6 +83,7 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
             @Override
             public void onCompletion(MediaPlayer mediaPlayer) {
                 stopAudio();
+                isFinished = true;
                 playerHeader.setText("Finished");
             }
         });
@@ -96,14 +98,19 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
         playBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(isPlaying){
-                    if(fileToPlay != null) {
-                        pauseAudio();
+                if(!isFinished) {
+                    if (isPlaying) {
+                        if (fileToPlay != null) {
+                            pauseAudio();
+                        }
+                    } else {
+                        if (fileToPlay != null) {
+                            resumeAudio();
+                        }
                     }
                 }else {
-                    if(fileToPlay != null) {
-                        resumeAudio();
-                    }
+                    playAudio(fileToPlay);
+                    isFinished = false;
                 }
             }
         });
@@ -124,10 +131,18 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-                if(fileToPlay != null) {
+                if(!isFinished) {
+                    if (fileToPlay != null) {
+                        int progress = playerSeekBar.getProgress();
+                        player.seekTo(progress);
+                        resumeAudio();
+                    }
+                }
+                else {
+                    playAudio(fileToPlay);
                     int progress = playerSeekBar.getProgress();
                     player.seekTo(progress);
-                    resumeAudio();
+                    isFinished = false;
                 }
             }
         });
@@ -163,6 +178,11 @@ public class AudioListFragment extends Fragment implements FileAdapter.OnItemLis
                 playAudio(fileToPlay);
             }
         }
+    }
+
+    @Override
+    public void OnItemLongCLicked(File file, int position) {
+        file.delete();
     }
 
     private void stopAudio() {

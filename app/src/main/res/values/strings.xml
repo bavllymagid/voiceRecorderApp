@@ -6,4 +6,6 @@
     <string name="media_player">Media Player</string>
     <string name="todo">TODO</string>
     <string name="file_name">File Name</string>
+    <string name="file_date">File Date</string>
+    <string name="press_to_record">Press to Record</string>
 </resources>

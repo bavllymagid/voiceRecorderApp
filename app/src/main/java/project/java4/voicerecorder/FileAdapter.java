@@ -42,7 +42,7 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileAdapterVie
         return allFiles.length;
     }
 
-    public class FileAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class FileAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
 
         ImageView list_image;
         TextView fileName;
@@ -55,15 +55,23 @@ public class FileAdapter extends RecyclerView.Adapter<FileAdapter.FileAdapterVie
             fileDate = itemView.findViewById(R.id.date);
 
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
             onItemListClicked.OnItemCLicked( allFiles[getAdapterPosition()], getAdapterPosition());
         }
+
+        @Override
+        public boolean onLongClick(View view) {
+            onItemListClicked.OnItemLongCLicked(allFiles[getAdapterPosition()] , getAdapterPosition());
+            return false;
+        }
     }
 
     public interface OnItemListClicked{
         void OnItemCLicked(File file , int position);
+        void OnItemLongCLicked(File file , int position);
     }
 }
